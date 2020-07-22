@@ -19,6 +19,7 @@ export default class Register extends React.Component {
 
     this.state = {
       redirect: false,
+      page: 0,
     };
   }
 
@@ -34,9 +35,6 @@ export default class Register extends React.Component {
 
   handleSubmit(event) {
     event.preventDefault();
-    this.setState({
-
-    });
     const {
       target: {
         [inputNames.repeatPassword]: { value: repeatPassword },
@@ -46,19 +44,22 @@ export default class Register extends React.Component {
       },
     } = event;
     if (repeatPassword && password && email && username) {
-      if (password === repeatPassword) {
-        fetch(`/api${apiRoutes.register}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            password,
-            email,
-            username,
-          }),
-        }).then((response) => response.json()).then(this.handleResponse);
-      } else {
-        alert('Password doesn\'t match');
-      }
+      this.setState({
+        page: 1,
+      });
+      // if (password === repeatPassword) {
+      //   fetch(`/api${apiRoutes.register}`, {
+      //     method: 'POST',
+      //     headers: { 'Content-Type': 'application/json' },
+      //     body: JSON.stringify({
+      //       password,
+      //       email,
+      //       username,
+      //     }),
+      //   }).then((response) => response.json()).then(this.handleResponse);
+      // } else {
+      //   alert('Password doesn\'t match');
+      // }
     } else {
       alert('Please fill all the fields');
     }
@@ -70,26 +71,68 @@ export default class Register extends React.Component {
 
     return (
       <div className="register">
-        <Link to={routes.landing}>Back</Link>
-        <form onSubmit={this.handleSubmit}>
-          <label>
-            Username:
-            <input required name={inputNames.name} type="username" />
-          </label>
-          <label>
-            Email:
-            <input required name={inputNames.email} type="email" />
-          </label>
-          <label>
-            Password:
-            <input required name={inputNames.password} type="password" />
-          </label>
-          <label>
-            Repeat:
-            <input required name={inputNames.repeatPassword} type="password" />
-          </label>
-          <button type="submit">Register</button>
-        </form>
+        <a
+          href={routes.landing}
+          onClick={(event) => {
+            if (this.state.custom) {
+              event.preventDefault();
+              alert('Negalima');
+            }
+          }}
+        >
+          Back
+
+        </a>
+        {this.state.page === 0 ? (
+          <form onSubmit={this.handleSubmit}>
+            <label>
+              Username:
+              <input
+                onChange={({ target: { value } }) => {
+                  this.setState({
+                    custom: value,
+                  });
+                }}
+                required
+                name={inputNames.name}
+                type="username"
+              />
+            </label>
+            <label>
+              Email:
+              <input required name={inputNames.email} type="email" />
+            </label>
+            <label>
+              Password:
+              <input required name={inputNames.password} type="password" />
+            </label>
+            <label>
+              Repeat:
+              <input required name={inputNames.repeatPassword} type="password" />
+            </label>
+            <button type="submit">Register</button>
+          </form>
+        ) : (
+          <form onSubmit={this.handleSubmitFinal}>
+            <label>
+              Second username:
+              <input required name={inputNames.name} type="username" />
+            </label>
+            <label>
+              Second Email:
+              <input required name={inputNames.email} type="email" />
+            </label>
+            <label>
+              Second Password:
+              <input required name={inputNames.password} type="password" />
+            </label>
+            <label>
+              Second Repeat:
+              <input required name={inputNames.repeatPassword} type="password" />
+            </label>
+            <button type="submit">Register</button>
+          </form>
+        )}
       </div>
     );
   }
