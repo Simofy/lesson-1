@@ -9,4 +9,6 @@ module.exports.apiRoutes = {
   login: '/auth/login',
   verify: '/verify',
   admin: '/api/admin',
+  data: '/data',
+  update: '/update',
 };

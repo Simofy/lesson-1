@@ -18,12 +18,31 @@ app.use((req, res, next) => {
 
 app.use('/api', require('./api'));
 
+const expressWs = require('express-ws')(app);
+const bcryptjs = require('bcryptjs');
 const db = require('./db');
 const dbConfig = require('./db/db.config');
 
 const Role = db.role;
+const Table = db.table;
 
 function initial() {
+  Table.estimatedDocumentCount(async (err, count) => {
+    if (!err && count === 0) {
+      for (let i = 0; i < 100; i += 1) {
+        new Table({
+          _id: i,
+          random: bcryptjs.genSaltSync(1).substring(0, 8),
+          text: bcryptjs.genSaltSync(1).substring(0, 8),
+          test: bcryptjs.genSaltSync(1).substring(0, 8),
+        }).save((errTable) => {
+          if (errTable) {
+            console.log('error', errTable);
+          }
+        });
+      }
+    }
+  });
   Role.estimatedDocumentCount((err, count) => {
     if (!err && count === 0) {
       new Role({
@@ -74,3 +93,17 @@ db.mongoose
   });
 
 app.listen(process.env.PORT || 8080, () => console.log(`Listening on port ${process.env.PORT || 8080}!`));
+
+app.ws('/ws', (ws, req) => {
+  ws.on('message', (msg) => {
+    console.log(msg);
+  });
+  console.log('alio');
+  Table.schema.addListener('update', (doc) => {
+    ws.send(JSON.stringify({
+      doc,
+    }));
+  });
+
+  console.log('socket', req.testing);
+});

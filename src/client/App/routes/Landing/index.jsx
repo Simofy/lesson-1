@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { routes } from '../../../../const/routes';
 import { storage } from '../../../../const/storage';
 import Context from '../../UserContext';
+import Profile from './components/Profile';
 
 export default class Landing extends React.Component {
   constructor(props) {
@@ -14,6 +15,7 @@ export default class Landing extends React.Component {
   logout(event, updateUser) {
     event.preventDefault();
     localStorage.removeItem(storage.user);
+    localStorage.removeItem(storage.token);
     updateUser(null);
   }
 
@@ -40,6 +42,7 @@ export default class Landing extends React.Component {
                   <Link to={routes.login} onClick={(event) => this.logout(event, updateUser)}>
                     Logout
                   </Link>
+                  <Profile />
                 </>
               )
               : (

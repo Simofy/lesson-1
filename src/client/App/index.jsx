@@ -12,10 +12,21 @@ import Login from './routes/Login';
 import Register from './routes/Register';
 import Extra from './components/Extra';
 import Context from './UserContext';
+import useWebSocket from './useWebSocket';
 
 export default function App() {
   const backgroundRef = useRef(null);
   const appRef = useRef(null);
+
+  const [registeredHandlers, setRegisteredHandlers] = useState([]);
+  const handleWS = useCallback((doc) => {
+    for (let i = 0; i < registeredHandlers.length; i += 1) {
+      registeredHandlers[i](doc);
+    }
+  }, [registeredHandlers]);
+
+  const [socket] = useWebSocket(handleWS);
+
   const [user, setUser] = useState(
     JSON.parse(localStorage.getItem(storage.user)),
   );
@@ -56,6 +67,7 @@ export default function App() {
   const handleTokenValidation = useCallback(({ status }) => {
     if (status !== 200) {
       localStorage.removeItem(storage.user);
+      localStorage.removeItem(storage.token);
       setUser(null);
     }
   }, []);
@@ -87,6 +99,15 @@ export default function App() {
     <Context.Provider value={{
       updateUser: setUser,
       displayName: generateRandom,
+      addHandler: (handler) => {
+        setRegisteredHandlers((oldList) => [
+          ...oldList,
+          handler,
+        ]);
+      },
+      removeHandler: (handler) => {
+        // TO-DO
+      }
     }}
     >
       <div ref={appRef} className="app">
@@ -114,14 +135,14 @@ export default function App() {
             </Switch>
           </BrowserRouter>
         </div>
-        <Extra name={{
+        {/* <Extra name={{
           name: 'test'
         }}
         >
           <div>
             123541234
           </div>
-        </Extra>
+        </Extra> */}
       </div>
     </Context.Provider>
   );

@@ -15,6 +15,7 @@ export default function Login() {
   const handleResponse = useCallback(({ message, ...user }) => {
     if (!message) {
       localStorage.setItem(storage.user, JSON.stringify(user));
+      localStorage.setItem(storage.token, JSON.stringify(user.accessToken));
       if (updateUser) {
         updateUser(user);
       }
